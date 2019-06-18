@@ -14,6 +14,7 @@ import Data.Foldable (foldl')
 import Data.List (transpose, sortOn)
 import System.Random
 import Text.Dot
+import Text.JSON
 import Control.Monad
 
 type Probability = Double
@@ -35,6 +36,10 @@ instance Functor (Tree s) where
   -- fmap :: (a -> b) -> Tree s a -> Tree s b
   fmap f (Node xs) = Node (fmap p xs)
     where p (val, child) = (f val, fmap f child)
+
+instance (Ord s, JSON s, JSON v) => JSON (Tree s v) where
+  readJSON x = Node <$> readJSON x
+  showJSON (Node x) = showJSON x
 
 -- | Converts a counting tree to a probability tree, where the probabilities in each node sum to 100% and
 -- | the probability of each child of a given node is proportional to its count.
